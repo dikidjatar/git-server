@@ -1,0 +1,27 @@
+{
+  "name": "git-server",
+  "version": "1.0.0",
+  "description": "Git server for Acode",
+  "license": "MIT",
+  "author": "Diki Djatar",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "npx nodemon ./src/server.js",
+    "start": "node ./src/server.js"
+  },
+  "devDependencies": {
+    "@types/node": "^24.2.1",
+    "nodemon": "^3.1.10"
+  },
+  "dependencies": {
+    "body-parser": "^2.2.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "express-ws": "^5.0.2",
+    "isomorphic-git": "^1.33.1",
+    "morgan": "^1.10.1"
+  }
+}
