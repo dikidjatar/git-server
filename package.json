@@ -1,0 +1,51 @@
+{
+  "name": "@dikidjatar/git-server",
+  "version": "1.0.0",
+  "description": "Git server for Acode - A lightweight Git server implementation using isomorphic-git",
+  "license": "MIT",
+  "author": "Diki Djatar",
+  "type": "module",
+  "main": "src/index.js",
+  "homepage": "https://github.com/dikidjatar/git-server#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dikidjatar/git-server.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dikidjatar/git-server/issues"
+  },
+  "bin": {
+    "git-server": "src/index.js"
+  },
+  "keywords": [
+    "git",
+    "isomorphic"
+  ],
+  "files": [
+    "src"
+  ],
+  "engines": {
+    "node": ">=14.17"
+  },
+  "scripts": {
+    "dev": "npx nodemon src/index.js",
+    "start": "node src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.2.1",
+    "nodemon": "^3.1.10"
+  },
+  "dependencies": {
+    "body-parser": "^2.2.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "express-ws": "^5.0.2",
+    "isomorphic-git": "^1.33.1",
+    "minimist": "^1.2.8",
+    "morgan": "^1.10.1",
+    "winston": "^3.17.0",
+    "winston-daily-rotate-file": "^5.0.0"
+  }
+}

@@ -1,0 +1,19 @@
+GET http://10.224.61.35:3080/git/status?dir=/data/data/com.termux/files/home/test-repository/test
+
+###
+
+POST http://10.224.61.35:3080/git/status
+Content-Type: application/json
+
+{
+  "dir": "/data/data/com.termux/files/home/test-repository/test"
+}
+
+###
+
+POST http://10.224.61.35:3080/git/listBranches
+Content-Type: application/json
+
+{
+  "dir": "/data/data/com.termux/files/home/test-repository/test"
+}

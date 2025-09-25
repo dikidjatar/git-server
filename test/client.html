@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Git Client — Test</title>
+  <style>
+    :root {
+      --bg: #0f1724;
+      --card: #0b1220;
+      --muted: #9aa4b2;
+      --accent: linear-gradient(90deg, #5eead4 0%, #60a5fa 100%);
+      --glass: rgba(255, 255, 255, 0.03);
+      --success: #10b981;
+      --danger: #ef4444;
+      --panel-radius: 12px;
+      --gap: 16px;
+      --max-w: 1100px;
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    html,
+    body {
+      height: 100%
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: radial-gradient(1200px 600px at 10% 10%, rgba(96, 165, 250, 0.06), transparent),
+        radial-gradient(900px 400px at 90% 90%, rgba(94, 234, 212, 0.04), transparent),
+        #071028;
+      color: #e6eef8;
+      padding: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--gap);
+    }
+
+    .app {
+      width: 100%;
+      max-width: var(--max-w);
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    /* Left panel (config) */
+    .panel {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+      padding: 20px;
+      border-radius: var(--panel-radius);
+      box-shadow: 0 6px 30px rgba(2, 6, 23, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.03);
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .logo {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      background: var(--accent);
+      display: grid;
+      place-items: center;
+      color: #032;
+      font-weight: 700;
+      box-shadow: 0 6px 18px rgba(96, 165, 250, 0.12);
+    }
+
+    .title {
+      font-weight: 600;
+      font-size: 1.15rem;
+      line-height: 1;
+    }
+
+    .subtitle {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    form.field {
+      margin-top: 8px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    input[type="text"],
+    select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.01), rgba(255, 255, 255, 0.00));
+      color: var(--muted);
+      outline: none;
+      font-size: 0.95rem;
+    }
+
+    input[type="text"]::placeholder {
+      color: #5b6a78;
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: 9px;
+      background: linear-gradient(90deg, #3b82f6, #06b6d4);
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      box-shadow: 0 8px 20px rgba(3, 7, 18, 0.45);
+    }
+
+    .btn.secondary {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      color: var(--muted);
+      box-shadow: none;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .small {
+      font-size: 0.85rem;
+      padding: 8px 10px;
+      border-radius: 8px;
+    }
+
+    /* Progress card */
+    .progress-card {
+      margin-top: 14px;
+      padding: 12px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.01), rgba(255, 255, 255, 0.00));
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.03);
+    }
+
+    .progress-line {
+      height: 12px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #10b981, #06b6d4);
+      transition: width 250ms linear;
+    }
+
+    .meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    /* Right panel (logs) */
+    .log-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      height: 640px;
+    }
+
+    .log-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      border-radius: 10px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.01), rgba(255, 255, 255, 0.00));
+      border: 1px solid rgba(255, 255, 255, 0.03);
+    }
+
+    .log-head h2 {
+      margin: 0;
+      font-size: 1rem;
+    }
+
+    .log-body {
+      flex: 1;
+      overflow: auto;
+      padding: 12px;
+      background: linear-gradient(180deg, rgba(2, 6, 23, 0.6), rgba(3, 7, 18, 0.4));
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.02);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace;
+      font-size: 0.9rem;
+      color: #d6e5f3;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .log-item {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 8px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.01);
+      border: 1px solid rgba(255, 255, 255, 0.01);
+    }
+
+    .log-meta {
+      min-width: 94px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      align-items: flex-start;
+    }
+
+    .log-text {
+      white-space: pre-wrap;
+      word-break: break-word;
+      color: #dbeafe;
+    }
+
+    .badge {
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #022;
+      background: #94f2c4;
+    }
+
+    .badge.warn {
+      background: #ffd86b;
+      color: #2b2b2b;
+    }
+
+    .badge.err {
+      background: #ff9aa2;
+      color: #2b2b2b;
+    }
+
+    /* Dialog (native) styling enhancement */
+    dialog::backdrop {
+      background: rgba(0, 0, 0, 0.45);
+    }
+
+    dialog {
+      border-radius: 12px;
+      border: none;
+      padding: 18px;
+      background: linear-gradient(180deg, #071225, #081426);
+      color: var(--muted);
+      width: 380px;
+      max-width: 90%;
+      box-shadow: 0 12px 40px rgba(2, 6, 23, 0.8);
+    }
+
+    dialog .row {
+      margin-top: 10px;
+    }
+
+    dialog .dialog-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    /* responsive */
+    @media (max-width:980px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .log-panel {
+        height: 420px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app" role="application" aria-label="Git realtime client">
+    <!-- LEFT: Configuration -->
+    <section class="panel" aria-labelledby="cfg-title">
+      <div class="header">
+        <div class="logo">G</div>
+        <div>
+          <div class="title" id="cfg-title">Git Realtime Client</div>
+          <div class="subtitle">Test realtime operations — clone / pull / push / fetch</div>
+        </div>
+      </div>
+
+      <form id="repo-form" class="field" autocomplete="off">
+        <label for="ws-base">WebSocket Base URL</label>
+        <input id="ws-base" type="text" placeholder="ws://host:port/git" value="ws://10.237.69.44:3080/git" />
+
+        <label for="repo-url">Repository URL</label>
+        <input id="repo-url" type="text" placeholder="https://github.com/owner/repo.git"
+          value="https://github.com/dikidjatar/idl" />
+
+        <div class="row" style="margin-top:4px;">
+          <div style="flex:1">
+            <label for="repo-dir">Target Dir</label>
+            <input id="repo-dir" type="text" placeholder="/test-repository/repo-name" />
+          </div>
+          <div style="width:120px">
+            <label for="git-action">Action</label>
+            <select id="git-action">
+              <option value="clone">clone</option>
+              <option value="pull">pull</option>
+              <option value="push">push</option>
+              <option value="fetch">fetch</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Dynamic options for actions -->
+        <div id="action-options" style="margin-top:10px; display:flex; flex-direction:column; gap:8px;">
+          <!-- Shared branch input (shown for pull & fetch) -->
+          <div id="opt-branch" style="display:none;">
+            <label for="branch-input">Branch (optional)</label>
+            <input id="branch-input" type="text" placeholder="e.g. main or feature/xyz" />
+          </div>
+
+          <!-- Pull-specific: singleBranch checkbox -->
+          <div id="opt-singlebranch" style="display:none; align-items:center;">
+            <label style="display:inline-flex; align-items:center; gap:8px;">
+              <input id="singlebranch-checkbox" type="checkbox" />
+              <span style="font-weight:600; font-size:0.95rem; color:var(--muted)">Single branch</span>
+            </label>
+            <div style="font-size:0.82rem; color:var(--muted); margin-top:4px;">
+              Jika dicentang, akan melakukan operasi single-branch (jika didukung server).
+            </div>
+          </div>
+
+          <!-- Fetch-specific: depth numeric -->
+          <div id="opt-depth" style="display:none;">
+            <label for="depth-input">Fetch depth (optional)</label>
+            <input id="depth-input" type="number" min="1" placeholder="e.g. 1 (shallow fetch)" />
+          </div>
+        </div>
+
+
+        <div class="controls">
+          <button type="submit" class="btn">Execute</button>
+          <button id="btn-disconnect" type="button" class="btn secondary small">Disconnect</button>
+          <button id="btn-clear" type="button" class="btn secondary small">Clear log</button>
+        </div>
+
+        <div class="progress-card" aria-hidden="false">
+          <div style="display:flex; align-items:center; justify-content:space-between;">
+            <div style="font-weight:700">Progress</div>
+            <div id="progress-status" style="font-size:0.85rem; color:var(--muted)">idle</div>
+          </div>
+
+          <div style="margin-top:10px;" class="progress-line" aria-hidden="true">
+            <div id="progress-fill" class="progress-fill" style="width:0%"></div>
+          </div>
+
+          <div class="meta">
+            <div id="progress-phase">—</div>
+            <div id="progress-percent">0%</div>
+          </div>
+        </div>
+      </form>
+    </section>
+
+    <!-- RIGHT: Logs -->
+    <section class="log-panel" aria-labelledby="log-title">
+      <div class="log-head">
+        <h2 id="log-title">Realtime Log</h2>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <div style="color:var(--muted); font-size:0.9rem">Status:</div>
+          <div id="conn-badge" class="badge" style="background:#bfe3ff;color:#022">disconnected</div>
+        </div>
+      </div>
+
+      <div id="log-body" class="log-body" aria-live="polite"></div>
+    </section>
+  </div>
+
+  <!-- AUTH dialog -->
+  <dialog id="auth-dialog" aria-label="Authentication required">
+    <div style="font-weight:700; color:#dbeafe">Authentication required</div>
+    <div style="margin-top:6px; color:var(--muted); font-size:0.95rem">The server requests credentials for: <span
+        id="auth-url" style="color:#fff"></span></div>
+
+    <form method="dialog" id="auth-form-dialog">
+      <div class="row">
+        <div style="flex:1">
+          <label for="auth-username">Username / Token</label>
+          <input id="auth-username" type="text" placeholder="username or token" />
+        </div>
+      </div>
+      <div class="row">
+        <div style="flex:1">
+          <label for="auth-password">Password (optional)</label>
+          <input id="auth-password" type="text" placeholder="password (if required)" />
+        </div>
+      </div>
+
+      <div class="dialog-actions">
+        <button id="auth-cancel" class="btn secondary small" type="button">Cancel</button>
+        <button id="auth-send" class="btn small" type="submit">Send</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script>
+    /* ========= Configuration & state ========= */
+    const defaultWSBase = document.getElementById('ws-base').value;
+    const wsBaseInput = document.getElementById('ws-base');
+    const repoUrlInput = document.getElementById('repo-url');
+    const repoDirInput = document.getElementById('repo-dir');
+    const actionSelect = document.getElementById('git-action');
+
+    // dynamic action controls
+    const actionOptions = document.getElementById('action-options');
+    const optBranch = document.getElementById('opt-branch');
+    const branchInput = document.getElementById('branch-input');
+    const optSingleBranch = document.getElementById('opt-singlebranch');
+    const singleBranchCheckbox = document.getElementById('singlebranch-checkbox');
+    const optDepth = document.getElementById('opt-depth');
+    const depthInput = document.getElementById('depth-input');
+
+    const repoForm = document.getElementById('repo-form');
+    const btnDisconnect = document.getElementById('btn-disconnect');
+    const btnClear = document.getElementById('btn-clear');
+
+    const progressFill = document.getElementById('progress-fill');
+    const progressStatus = document.getElementById('progress-status');
+    const progressPhase = document.getElementById('progress-phase');
+    const progressPercent = document.getElementById('progress-percent');
+
+    const connBadge = document.getElementById('conn-badge');
+    const logBody = document.getElementById('log-body');
+
+    const authDialog = document.getElementById('auth-dialog');
+    const authUrlEl = document.getElementById('auth-url');
+    const authFormDialog = document.getElementById('auth-form-dialog');
+    const authUserInput = document.getElementById('auth-username');
+    const authPassInput = document.getElementById('auth-password');
+    const authCancel = document.getElementById('auth-cancel');
+
+    let socket = null;
+    let currentAction = null;
+    let isConnected = false;
+
+    /* ========= Utilities ========= */
+    function ts() {
+      const d = new Date();
+      return d.toLocaleString();
+    }
+
+    function log(message, level = 'info') {
+      const el = document.createElement('div');
+      el.className = 'log-item';
+      const meta = document.createElement('div');
+      meta.className = 'log-meta';
+      meta.innerHTML = `<div style="font-weight:700">${ts()}</div><div style="color:var(--muted); font-size:0.8rem">${level}</div>`;
+
+      const txt = document.createElement('div');
+      txt.className = 'log-text';
+      txt.textContent = message;
+
+      if (level === 'error') {
+        const badge = document.createElement('div');
+        badge.className = 'badge err';
+        badge.textContent = 'ERR';
+        meta.appendChild(badge);
+      } else if (level === 'warn') {
+        const badge = document.createElement('div');
+        badge.className = 'badge warn';
+        badge.textContent = 'WARN';
+        meta.appendChild(badge);
+      }
+
+      el.appendChild(meta);
+      el.appendChild(txt);
+      logBody.appendChild(el);
+      logBody.scrollTop = logBody.scrollHeight;
+    }
+
+    function setConnState(connected) {
+      isConnected = !!connected;
+      connBadge.textContent = connected ? 'connected' : 'disconnected';
+      connBadge.style.background = connected ? '#b6f0d0' : '#ffecd5';
+      connBadge.style.color = connected ? '#032' : '#2b2b2b';
+    }
+
+    function resetProgress() {
+      progressFill.style.width = '0%';
+      progressStatus.textContent = 'idle';
+      progressPhase.textContent = '—';
+      progressPercent.textContent = '0%';
+    }
+
+    /* ========= WebSocket logic ========= */
+    function buildSocketUrl(action) {
+      // ensure wsBase doesn't end with slash
+      const base = (wsBaseInput.value || defaultWSBase).replace(/\/$/, '');
+      return `${base}/${action}`;
+    }
+
+    function ensureCloseSocket() {
+      if (socket && socket.readyState !== WebSocket.CLOSED) {
+        try { socket.close(); } catch (e) { /* ignore */ }
+      }
+      socket = null;
+      setConnState(false);
+    }
+
+    function connect(action) {
+      // close existing socket (if different action)
+      if (socket) {
+        ensureCloseSocket();
+      }
+
+      currentAction = action;
+      const url = buildSocketUrl(action);
+      log(`→ Opening websocket: ${url}`, 'info');
+
+      socket = new WebSocket(url);
+
+      socket.addEventListener('open', () => {
+        setConnState(true);
+        log(`Connection opened [${action}]`, 'info');
+        progressStatus.textContent = 'connected';
+      });
+
+      socket.addEventListener('message', (ev) => {
+        try {
+          const payload = JSON.parse(ev.data);
+          handleServerEvent(payload);
+        } catch (e) {
+          log(`Failed to parse message: ${e.message}\nRaw: ${ev.data}`, 'warn');
+        }
+      });
+
+      socket.addEventListener('error', (ev) => {
+        log(`WebSocket error: ${ev.message || 'see console'}`, 'error');
+      });
+
+      socket.addEventListener('close', (ev) => {
+        setConnState(false);
+        log(`Connection closed (code ${ev.code})`, 'warn');
+        progressStatus.textContent = 'closed';
+      });
+    }
+
+    function sendStart(action, payload = {}) {
+      if (!socket || socket.readyState !== WebSocket.OPEN) {
+        connect(action);
+        // send onopen
+        socket.addEventListener('open', function onceOpen() {
+          try {
+            socket.send(JSON.stringify({ event: `${action}:start`, payload }));
+            log(`Sent start: ${action}`, 'info');
+          } catch (e) {
+            log(`Send failed: ${e.message}`, 'error');
+          }
+          socket.removeEventListener('open', onceOpen);
+        });
+      } else {
+        socket.send(JSON.stringify({ event: `${action}:start`, payload }));
+        log(`Sent start: ${action}`, 'info');
+      }
+    }
+
+    function handleServerEvent(obj) {
+      // expected shape: { event, data, error }
+      if (!obj || !obj.event) { log('Invalid server object', 'warn'); return; }
+      const [evAction, evType] = obj.event.split(':'); // e.g. clone:progress
+
+      // only process events for currentAction or generic ones
+      const matchesAction = (currentAction && evAction === currentAction);
+
+      // If server uses same endpoint (like sends auth before explicit action), allow events if evAction === currentAction OR startsWith currentAction
+      if (!matchesAction) {
+        // ignore events not related to current action
+        // but we will still show unknown events
+        log(`(other) ${obj.event} ${JSON.stringify(obj.data || obj.error || '')}`, 'warn');
+      }
+
+      switch (obj.event) {
+        case `${currentAction}:progress`:
+          handleProgress(obj.data);
+          break;
+        case `${currentAction}:message`:
+          log(String(obj.data?.message ?? JSON.stringify(obj.data)), 'info');
+          break;
+        case `${currentAction}:auth`:
+          // server requests auth, show dialog
+          const url = obj.data?.url || 'remote';
+          const authInfo = obj.data?.auth || {};
+          showAuthDialog(url, authInfo);
+          log('Server requested authentication', 'warn');
+          break;
+        case `${currentAction}:done`:
+          if (obj.error) {
+            log(`Operation finished with error: ${obj.error}`, 'error');
+          } else {
+            log('Operation finished successfully ✅', 'info');
+          }
+          // ensure progress fills
+          progressFill.style.width = '100%';
+          progressPercent.textContent = '100%';
+          progressStatus.textContent = 'done';
+          break;
+        default:
+          // generic fallback: show the raw event
+          log(`${obj.event} ${JSON.stringify(obj.data || obj.error || '')}`, 'info');
+      }
+    }
+
+    function handleProgress(data = {}) {
+      const loaded = Number(data.loaded || 0);
+      const total = Number(data.total || 0);
+      const phase = data.phase || 'working';
+      const percent = total ? Math.round((loaded / total) * 100) : (data.percent || 0);
+      progressFill.style.width = `${percent}%`;
+      progressPhase.textContent = phase;
+      progressPercent.textContent = `${percent}%`;
+      progressStatus.textContent = `${phase} (${percent}%)`;
+      if (data.message) log(`[${phase}] ${data.message}`, 'info');
+    }
+
+    /* ========= Auth dialog handlers ========= */
+    function showAuthDialog(url = '', authInfo = {}) {
+      authUrlEl.textContent = url;
+      authUserInput.value = authInfo.username || '';
+      authPassInput.value = authInfo.password || '';
+      try {
+        if (typeof authDialog.showModal === 'function') {
+          authDialog.showModal();
+        } else {
+          // fallback: simple alert-like prompt (very old browsers)
+          const u = prompt(`Auth for ${url}\nusername/token:`);
+          if (u) sendAuth({ username: u });
+        }
+      } catch (e) {
+        console.error('dialog error', e);
+      }
+    }
+
+    authFormDialog.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      const username = authUserInput.value.trim();
+      const password = authPassInput.value.trim();
+      if (!username) {
+        log('Auth username/token is required', 'warn');
+        return;
+      }
+      sendAuth({ username, password });
+      try { authDialog.close(); } catch (e) { }
+      authUserInput.value = '';
+      authPassInput.value = '';
+    });
+
+    authCancel.addEventListener('click', () => {
+      try { authDialog.close(); } catch (e) { }
+      log('Authentication cancelled by user', 'warn');
+    });
+
+    function sendAuth(credentials = {}) {
+      if (!socket || socket.readyState !== WebSocket.OPEN) {
+        log('No active connection to send credentials', 'error');
+        return;
+      }
+      socket.send(JSON.stringify(credentials));
+      log('Sent credentials to server (token/username)', 'info');
+    }
+
+    /* ========= UI actions ========= */
+    // Show/hide dynamic options depending on selected action
+    function updateActionOptionsUI(action) {
+      // default hide everything
+      optBranch.style.display = 'none';
+      optSingleBranch.style.display = 'none';
+      optDepth.style.display = 'none';
+
+      // reset values when switching actions? keep user input unless explicitly cleared
+      if (action === 'pull') {
+        optBranch.style.display = 'block';
+        optSingleBranch.style.display = 'block';
+      } else if (action === 'fetch') {
+        optBranch.style.display = 'block';
+        optDepth.style.display = 'block';
+      } else {
+        // clone/push -> hide both
+      }
+    }
+
+    // initialize UI based on current selection
+    updateActionOptionsUI(actionSelect.value);
+
+    // listen for changes
+    actionSelect.addEventListener('change', (e) => {
+      updateActionOptionsUI(e.target.value);
+    });
+
+    repoForm.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      const action = actionSelect.value;
+      const repoUrl = repoUrlInput.value.trim();
+      let repoDir = repoDirInput.value.trim();
+
+      if (!repoUrl) { log('Repository URL is required', 'warn'); return; }
+      if (!repoDir) {
+        const match = repoUrl.match(/\/([^\/]+?)(?:\.git)?$/);
+        const name = match ? match[1] : `repo-${Date.now()}`;
+        repoDir = `/test-repository/${name}`;
+        repoDirInput.value = repoDir;
+      }
+
+      resetProgress();
+      setConnState(false);
+
+      const payload = { url: repoUrl, dir: repoDir };
+      const branchVal = branchInput.value.trim();
+      if (branchVal) {
+        payload.ref = branchVal;
+      }
+      // pull-specific: singleBranch flag
+      if (action === 'pull') {
+        payload.singleBranch = !!singleBranchCheckbox.checked;
+      }
+      // fetch-specific: depth (number)
+      if (action === 'fetch') {
+        const d = parseInt(depthInput.value, 10);
+        if (!Number.isNaN(d) && d > 0) {
+          payload.depth = d;
+        }
+      }
+
+      sendStart(action, payload);
+    });
+
+    btnDisconnect.addEventListener('click', () => {
+      ensureCloseSocket();
+      setConnState(false);
+      log('Manual disconnect', 'warn');
+    });
+
+    btnClear.addEventListener('click', () => {
+      logBody.innerHTML = '';
+      resetProgress();
+      log('Cleared logs', 'info');
+    });
+
+    // Save ws base in localStorage to ease testing
+    wsBaseInput.addEventListener('change', () => {
+      try { localStorage.setItem('git_ws_base', wsBaseInput.value); } catch (e) { }
+    });
+
+    // restore previous base if exists
+    (function restoreSettings() {
+      try {
+        const stored = localStorage.getItem('git_ws_base');
+        if (stored) wsBaseInput.value = stored;
+      } catch (e) { }
+      // prefill repoDir from repoUrl if empty
+      if (!repoDirInput.value) {
+        repoDirInput.value = buildAutoDirFromUrl(repoUrlInput.value);
+      }
+      resetProgress();
+      setConnState(false);
+    }());
+
+    // ======= Auto-update repo dir when repo URL changes (safe) =======
+    // keep track of last auto-generated dir so we don't override user edits
+    let lastAutoGeneratedDir = '';
+
+    // initialize lastAutoGeneratedDir from existing value if it matches pattern
+    (function initAutoDir() {
+      const v = repoDirInput.value.trim();
+      if (v && /^\/test-repository\/[^\/]+$/.test(v)) {
+        lastAutoGeneratedDir = v;
+      }
+    })();
+
+    // helper to build dir from repo url
+    function buildAutoDirFromUrl(url) {
+      if (!url) return '';
+      const m = url.trim().match(/\/([^\/]+?)(?:\.git)?$/);
+      const name = m ? m[1] : '';
+      return name ? `/test-repository/${name}` : '';
+    }
+
+    // update repo-dir while user types in repo-url, but don't override custom dir
+    repoUrlInput.addEventListener('input', (ev) => {
+      const url = ev.target.value.trim();
+      const auto = buildAutoDirFromUrl(url);
+
+      // if repoDir is empty OR it equals the last auto-generated value, replace it
+      const currentDir = repoDirInput.value.trim();
+      if (!currentDir || currentDir === lastAutoGeneratedDir) {
+        repoDirInput.value = auto;
+        lastAutoGeneratedDir = auto;
+      }
+    });
+
+    // if user edits repo-dir manually (non-standard pattern), stop auto-updates
+    repoDirInput.addEventListener('input', () => {
+      const cur = repoDirInput.value.trim();
+      // if user typed something that doesn't match auto pattern, treat as manual
+      if (cur && !/^\/test-repository\/[^\/]+$/.test(cur)) {
+        lastAutoGeneratedDir = ''; // prevent overwriting custom value
+      }
+    });
+  </script>
+</body>
+
+</html>
