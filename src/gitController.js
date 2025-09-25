@@ -6,7 +6,7 @@ const git = gitService.default;
 const wrapAsync = fn => async (req, res, next) => {
 	try {
 		const result = await fn(req, res);
-		res.json(result);
+		res.json({ data: result });
 	} catch (err) {
 		next(err);
 	}

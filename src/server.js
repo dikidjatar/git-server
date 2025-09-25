@@ -175,7 +175,7 @@ const parseCommandLineArgs = () => {
       h: 'host'
     },
     default: {
-      port: process.env.PORT || '3000',
+      port: process.env.PORT || '3080',
       host: process.env.HOST || 'localhost'
     }
   });
@@ -197,15 +197,15 @@ export async function startServer() {
       const isPublic = HOST !== 'localhost';
       const ap0Ip = isPublic ? getAp0InetIp() : null;
 
-      logger.info('Server started', {
-        environment: NODE_ENV,
-        port: PORT,
-        originalPort: startPort,
-        host: HOST,
-        localUrl: `http://${HOST}:${PORT}`,
-        publicUrl: ap0Ip ? `http://${ap0Ip}:${PORT}` : undefined,
-        logPath: getLogPath()
-      });
+      // logger.info('Server started', {
+      //   environment: NODE_ENV,
+      //   port: PORT,
+      //   originalPort: startPort,
+      //   host: HOST,
+      //   localUrl: `http://${HOST}:${PORT}`,
+      //   publicUrl: ap0Ip ? `http://${ap0Ip}:${PORT}` : undefined,
+      //   logPath: getLogPath()
+      // });
 
       const divider = '='.repeat(50);
       console.log('\x1b[36m%s\x1b[0m', divider);
@@ -221,6 +221,8 @@ export async function startServer() {
       if (ap0Ip) {
         console.log('\x1b[32m%s\x1b[0m', `🌍 Public URL: http://${ap0Ip}:${PORT}`);
       }
+
+      console.log('\x1b[32m%s\x1b[0m', `📝 Log Path: ${getLogPath()}`);
 
       console.log('\x1b[36m%s\x1b[0m', divider);
       console.log('\x1b[32m%s\x1b[0m', '✅ Server started successfully\n');

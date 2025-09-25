@@ -24,8 +24,8 @@ git clone https://github.com/dikidjatar/git-server.git
 # Install dependencies
 yarn install
 
-# Start development server
-yarn dev
+# Start server
+yarn start
 ```
 
 ### Command Line Usage
@@ -38,7 +38,7 @@ git-server
 git-server --port 8080 --host 0.0.0.0
 
 # Using short flags
-git-server -p 8080 -h 0.0.0.0
+git-server -p 8080 -h localhost
 ```
 
 ## API Documentation & Usage

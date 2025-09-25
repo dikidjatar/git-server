@@ -48,13 +48,8 @@ export function resolveRepoDir(dir) {
     p = '/' + p;
   }
 
-  let abs;
-  if (p.startsWith('/')) {
-    abs = path.normalize(p);
-  } else {
-    throw new RelativePathNotAllowed(p);
-  }
-
+  let abs = path.normalize(p);
+  
   const pathEnv = classifyPathEnvironment(abs);
   const terminal = detectTerminalEnv();
 
